@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 import useImageLoader from './hooks/useImageLoader';
 import parkEasyHero from "../assets/ParkEasyHero.png";
 import parkEasyLogo from "../assets/ParkEasyLogo.png";
@@ -79,19 +80,29 @@ const parkingSpots = [
 
 
 function Homepage() {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    navigate('/Authentication')
+  }
+
+  const handleRedirectHome = () => {
+    navigate('/')
+  }
+
   return (
     <>
       {/* Navigation Bar */}
       <div className="HomeNavBar flex justify-between items-center px-6  bg-white shadow-md">
         <div className="w-[100px]">
-          <img src={parkEasyLogo} alt="Logo" />
+          <img src={parkEasyLogo} alt="Logo" onClick={handleRedirectHome}/>
         </div>
         <div className="text-lg flex gap-6 text-gray-700">
-          <span className="cursor-pointer hover:text-blue-600">Home</span>
+          <span className="cursor-pointer hover:text-blue-600" onClick={handleRedirectHome}>Home</span>
           <span className="cursor-pointer hover:text-blue-600">About</span>
           <span className="cursor-pointer hover:text-blue-600">Contact</span>
           <span>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition">
+            <button onClick={handleLogin} className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition">
               Login
             </button>
           </span>
@@ -143,7 +154,6 @@ function Homepage() {
       </div>
 
       {/* Footer Section */}
-      {/* Footer */}
       <div className="bg-white border-t py-6 text-center text-sm text-gray-600">
         <div className="flex flex-col sm:flex-row justify-center gap-6 mb-3">
           <p className="cursor-pointer hover:text-blue-600">Terms of Service</p>
