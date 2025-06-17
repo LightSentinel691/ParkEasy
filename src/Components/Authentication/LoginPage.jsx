@@ -2,12 +2,14 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
 import useUserRole from "../hooks/useUserRole";
+import Toast from "../Toast";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState(null);
   const [triggered, setTriggered] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   // Only load role logic after login
   const { role, loading } = useUserRole(triggered);
@@ -15,10 +17,11 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAuthError(null);
-
+    
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      setTriggered(true); 
+      setTriggered(true);
+      setToastMessage("Login successful! Redirecting...");
     } catch (err) {
       setAuthError("Invalid credentials. Please try again.");
       console.error("Login Error:", err.message);
@@ -62,6 +65,12 @@ const LoginPage = () => {
             >
               {loading ? "Logging in..." : "Log In"}
             </button>
+            {toastMessage && (
+              <Toast 
+                message={toastMessage}
+                onClose={() => setToastMessage("")}
+              />
+            )}
           </form>
         </div>
       </div>
@@ -79,7 +88,6 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
 
 // To DO:-
 // Pass the Role to the next page
