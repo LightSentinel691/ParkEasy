@@ -219,3 +219,4 @@ const DisplayParkingSpot = ({ slot }) => {
 //Create the Reserve Page and Link to It
 // Have the Navbar Links Functionality.
 //Hover Feature on Parking Listing.
+// On loading the page check if the user is logged in
