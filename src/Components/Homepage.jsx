@@ -3,7 +3,7 @@ import useImageLoader from './hooks/useImageLoader';
 import parkEasyHero from "../assets/ParkEasyHero.png";
 import parkEasyLogo from "../assets/ParkEasyLogo.png";
 
-//Format of Parking Object, to be used
+
 const parkingSpots = [
   {
     id: 1,
@@ -204,3 +204,8 @@ const DisplayParkingSpot = ({ slot }) => {
   );
 };
 
+//To Do:- 
+//Implement the search Function
+//Create the Reserve Page and Link to It
+// Have the Navbar Links Functionality.
+//Hover Feature on Parking Listing.
