@@ -41,6 +41,3 @@ const useUserRole = (trigger = true) => {
 };
 
 export default useUserRole;
-
-
-// Observe routing behaviour here, or extrapolate it to Login Page and redirect there 
