@@ -1,5 +1,8 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import parkingSlots from '../Data/db.json';
+
+const parkingSpots = parkingSlots
 
 export default function BookingConfirmation() {
   const { state } = useLocation();
@@ -7,7 +10,13 @@ export default function BookingConfirmation() {
 
   if (!state) return <p>Missing booking data</p>;
 
-  const { id } = state;
+  const  id  = state;
+  const bookingArr = parkingSpots.filter((parkingSpot) => (
+    parkingSpot.id === id
+  ))
+  const bookingObject = bookingArr[0];
+  console.log(bookingObject)
+  
 
   return (
     <div className="min-h-screen bg-white px-6 py-10">
@@ -42,7 +51,7 @@ export default function BookingConfirmation() {
         <section className="mb-6">
           <h2 className="text-md font-semibold mb-2">Booking Details</h2>
 
-          <p className="w-full bg-gray-100 p-3 rounded mb-3">{id}</p>
+          <p className="w-full bg-gray-100 p-3 rounded mb-3">{bookingObject.title}</p>
           <input type="date" className="w-full bg-gray-100 p-3 rounded mb-3" />
           <input type="time" className="w-full bg-gray-100 p-3 rounded mb-3" />
           <input
