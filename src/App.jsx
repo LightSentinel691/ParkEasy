@@ -7,6 +7,7 @@ import RegisterPage from "./Components/Authentication/Registration";
 import BookingConfirmation from "./Components/BookingConfirmation";
 import { useState } from "react";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import UserBookings from "./Components/UserBookings";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -28,6 +29,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/Bookings" element={< UserBookings />} />
         </Routes>
       </BrowserRouter>
     </>
@@ -35,3 +37,6 @@ function App() {
 }
 
 export default App;
+
+
+// Userbookings is not protected as it is not visible when opening the page only after one has Logged in
