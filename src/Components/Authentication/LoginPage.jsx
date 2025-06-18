@@ -24,14 +24,13 @@ const LoginPage = () => {
 
   // Redirect based on role
   if (role === "admin") navigate("/admin-dashboard");
-  else if (role === "manager") navigate("/manager-portal");
   else if (role === "client") {
     if (from === "/") {
       setIsAuthenticated(true);
       navigate("/");
     } else {
       setIsAuthenticated(true);
-      navigate("/confirm", { state: parkingSlotId });
+      navigate("/confirm", { state: parkingSlotId, replace: true });
     }
   }
 
