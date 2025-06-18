@@ -13,5 +13,3 @@ const ProtectedRoute = ({ children, isAuthenticated }) => {
 };
 
 export default ProtectedRoute;
-
-//On successful login if from the reserve object, we should take to the Booking Page
