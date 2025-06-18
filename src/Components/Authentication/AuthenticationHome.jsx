@@ -3,7 +3,7 @@ import parkEasyLogo from "../../assets/ParkEasyLogo.png";
 import { Outlet } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 
-function AuthenticationHome() {
+function AuthenticationHome({setIsAuthenticated}) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,7 +61,7 @@ function AuthenticationHome() {
         </div>
         <hr className="border-t border-gray-300 w-3/4 mx-auto mt-2" />
       </div>
-      <Outlet />
+      <Outlet context={{setIsAuthenticated}} />
     </>
   );
 }
