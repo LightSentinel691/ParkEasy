@@ -68,5 +68,3 @@ function AuthenticationHome({setIsAuthenticated}) {
 
 export default AuthenticationHome;
 
-// Need to add Conditional classes with state-based logic (isActive). Hook this up with routing next for seamless navigation
-
