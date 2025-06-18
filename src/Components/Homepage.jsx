@@ -89,6 +89,11 @@ function Homepage() {
   const handleRedirectHome = () => {
     navigate('/')
   }
+  
+  const handleUserBooking = (id) => {
+    console.log("The id of the object is " + id);
+    navigate('/Confirm', {state: id});
+  }
 
   return (
     <>
@@ -150,7 +155,7 @@ function Homepage() {
 
       {/* Available Parking Slots Section */}
       <div>
-        <ListParkingSpots />
+        <ListParkingSpots handleUserBooking={handleUserBooking}/>
       </div>
 
       {/* Footer Section */}
@@ -168,15 +173,17 @@ function Homepage() {
 
 export default Homepage;
 
-const ListParkingSpots = () => {
+const ListParkingSpots = ({handleUserBooking}) => {
   // Parking Slot List Wrapper 
   //Get the data from Database
   const firstFiveSlots = parkingSpots.slice(0, 6);
 
+  
+
   return (
     <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 py-10 bg-gray-50">
       {firstFiveSlots.map((parkingSlot) => (
-        <DisplayParkingSpot key={parkingSlot.id} slot={parkingSlot} />
+        <DisplayParkingSpot key={parkingSlot.id} slot={parkingSlot} handleUserBooking={handleUserBooking}/>
       ))}
     </ul>
   );
@@ -185,7 +192,7 @@ const ListParkingSpots = () => {
 
 
 
-const DisplayParkingSpot = ({ slot }) => {
+const DisplayParkingSpot = ({ slot, handleUserBooking }) => {
   const { imageLoaded, imageSrc } = useImageLoader(slot.Thumbnail);
 
   return (
@@ -206,7 +213,7 @@ const DisplayParkingSpot = ({ slot }) => {
         <p className="text-gray-600">Slots: {slot.slotsAvailable}</p>
         <p className="text-gray-600">Rate: ${`${slot.charges}`}/hour</p>
         <p className="text-gray-500 text-sm">{slot.location}</p>
-        <button className="mt-2 bg-blue-600 text-white w-full py-2 rounded-md hover:bg-blue-700 transition">
+        <button onClick={() => {handleUserBooking(slot.id)}} className="mt-2 bg-blue-600 text-white w-full py-2 rounded-md hover:bg-blue-700 transition">
           Reserve
         </button>
       </div>
