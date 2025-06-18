@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { getDoc, doc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../../firebase';
 
 const useUserRole = (trigger = true) => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  
+  
 
   useEffect(() => {
     if (!trigger) return (
@@ -21,10 +21,7 @@ const useUserRole = (trigger = true) => {
           const userRole = userDoc.exists() ? userDoc.data().role : 'client';
           setRole(userRole);
 
-          // Redirect based on role
-          if (userRole === 'admin') navigate('/admin-dashboard');
-          else if (userRole === 'manager') navigate('/manager-portal');
-          else navigate('/');
+          
         } catch (error) {
           console.error('Error fetching user role:', error);
         }
@@ -35,7 +32,7 @@ const useUserRole = (trigger = true) => {
     });
 
     return () => unsubscribe();
-  }, [navigate, trigger]);
+  }, [trigger]);
 
   return { role, loading };
 };

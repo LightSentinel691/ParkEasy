@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
 import useUserRole from "../hooks/useUserRole";
 import Toast from "../Toast";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -10,14 +11,34 @@ const LoginPage = () => {
   const [authError, setAuthError] = useState(null);
   const [triggered, setTriggered] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const { setIsAutheticated } = useOutletContext();
+  const navigate = useNavigate();
+  const { setIsAuthenticated } = useOutletContext();
 
   // Only load role logic after login
-  const { role, loading } = useUserRole(triggered);
+  const { role, loading } = useUserRole(triggered, setIsAutheticated);
+
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  const parkingSlotId = location.state?.id;
+
+  // Redirect based on role
+  if (role === "admin") navigate("/admin-dashboard");
+  else if (role === "manager") navigate("/manager-portal");
+  else if (role === "client") {
+    if (from === "/") {
+      setIsAuthenticated(true);
+      navigate("/");
+    } else {
+      setIsAuthenticated(true);
+      navigate("/confirm", { state: parkingSlotId });
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAuthError(null);
-    
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       setTriggered(true);
@@ -66,7 +87,7 @@ const LoginPage = () => {
               {loading ? "Logging in..." : "Log In"}
             </button>
             {toastMessage && (
-              <Toast 
+              <Toast
                 message={toastMessage}
                 onClose={() => setToastMessage("")}
               />
@@ -88,6 +109,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
-// To DO:-
-// Pass the Role to the next page
