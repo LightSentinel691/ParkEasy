@@ -157,3 +157,5 @@ const DisplayParkingSpot = ({ slot, handleUserBooking }) => {
 // Have the Navbar Links Functionality.
 //Hover Feature on Parking Listing.
 // On loading the page check if the user is logged in
+// Add icon on user logging in
+// On logging in the taskbar changes to show the Bookings tab
