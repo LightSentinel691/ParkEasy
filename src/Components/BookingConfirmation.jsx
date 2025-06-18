@@ -1,22 +1,52 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
-import parkingSlots from '../Data/db.json';
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import parkingSlots from "../Data/db.json";
 
-const parkingSpots = parkingSlots
+import { useBooking } from "./hooks/useBooking";
+
+const parkingSpots = parkingSlots;
 
 export default function BookingConfirmation() {
   const { state } = useLocation();
-  
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    date: "",
+    time: "",
+    duration: "",
+    name: "",
+    phone: "",
+    cardNumber: "",
+    expiry: "",
+    cvv: "",
+  });
+
+  const { submitBooking, loading, error } = useBooking();
+
+  const id = state;
+  const bookingArr = parkingSpots.filter(
+    (parkingSpot) => parkingSpot.id === id
+  );
+  const bookingObject = bookingArr[0];
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const bookingObj = { location: bookingObject.title, ...formData };
+    await submitBooking(bookingObj);
+  };
 
   if (!state) return <p>Missing booking data</p>;
 
-  const  id  = state;
-  const bookingArr = parkingSpots.filter((parkingSpot) => (
-    parkingSpot.id === id
-  ))
-  const bookingObject = bookingArr[0];
-  console.log(bookingObject)
-  
+  const handleShowBookings = () => {
+    navigate("/Bookings");
+  };
 
   return (
     <div className="min-h-screen bg-white px-6 py-10">
@@ -30,7 +60,7 @@ export default function BookingConfirmation() {
           <a href="#" className="hover:underline">
             Home
           </a>
-          <a href="#" className="hover:underline">
+          <a onClick={handleShowBookings} className="hover:underline">
             Bookings
           </a>
           <a href="#" className="hover:underline">
@@ -51,68 +81,97 @@ export default function BookingConfirmation() {
         <section className="mb-6">
           <h2 className="text-md font-semibold mb-2">Booking Details</h2>
 
-          <p className="w-full bg-gray-100 p-3 rounded mb-3">{bookingObject.title}</p>
-          <input type="date" className="w-full bg-gray-100 p-3 rounded mb-3" />
-          <input type="time" className="w-full bg-gray-100 p-3 rounded mb-3" />
+          <p className="w-full bg-gray-100 p-3 rounded mb-3">
+            {bookingObject.title}
+          </p>
+        </section>
+      </div>
+      <form onSubmit={handleSubmit} className="max-w-xl mx-auto mt-10">
+        <section className="mb-6">
+          <h2 className="text-md font-semibold mb-2">Booking Details</h2>
+          <input
+            type="date"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            className="w-full bg-gray-100 p-3 rounded mb-3"
+          />
+          <input
+            type="time"
+            name="time"
+            value={formData.time}
+            onChange={handleChange}
+            className="w-full bg-gray-100 p-3 rounded mb-3"
+          />
           <input
             type="text"
+            name="duration"
             placeholder="Duration in Minutes"
+            value={formData.duration}
+            onChange={handleChange}
             className="w-full bg-gray-100 p-3 rounded mb-3"
           />
         </section>
 
-        {/* Payment Details */}
         <section className="mb-6">
           <h2 className="text-md font-semibold mb-2">Payment Details</h2>
-
           <input
             type="text"
+            name="name"
             placeholder="Enter your name"
+            value={formData.name}
+            onChange={handleChange}
             className="w-full bg-gray-100 p-3 rounded mb-3"
           />
           <input
             type="text"
+            name="phone"
             placeholder="Enter your phone number"
+            value={formData.phone}
+            onChange={handleChange}
             className="w-full bg-gray-100 p-3 rounded mb-3"
           />
           <input
             type="text"
+            name="cardNumber"
             placeholder="Enter card number"
+            value={formData.cardNumber}
+            onChange={handleChange}
             className="w-full bg-gray-100 p-3 rounded mb-3"
           />
           <div className="flex gap-3 mb-3">
             <input
               type="text"
+              name="expiry"
               placeholder="MM/YY"
+              value={formData.expiry}
+              onChange={handleChange}
               className="w-1/2 bg-gray-100 p-3 rounded"
             />
             <input
               type="text"
+              name="cvv"
               placeholder="Enter CVV"
+              value={formData.cvv}
+              onChange={handleChange}
               className="w-1/2 bg-gray-100 p-3 rounded"
             />
           </div>
         </section>
 
-        {/* Summary */}
-        <div className="flex justify-between mb-6">
-          <span className="font-semibold">Total</span>
-          <span className="text-sm">$10.00</span>
-        </div>
-
-        <button className="w-full bg-blue-500 text-white p-3 rounded-full font-semibold hover:bg-blue-600">
-          Confirm Booking and Pay
+        {error && <p className="text-red-500 mb-3">{error}</p>}
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+          disabled={loading}
+        >
+          {loading ? "Submitting..." : "Submit Booking"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }
 
 // To do: -
-//On booking it redirects users to the Bookings page
-//On user clicking before loggin in - we should redirect them to login page and then back to homepage
 // Total to be calculated after entering the time
-// Get the users object to from the localstorage
-
-//Feature addition: -
-//We can redirect them to the booking page with the updated data.
+// Navigation Links on the top bar
