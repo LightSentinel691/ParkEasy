@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  getDoc,
+  doc,
+} from "firebase/firestore";
 import { db, auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -9,19 +16,31 @@ const useVehicles = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubAuth = onAuthStateChanged(auth, (user) => {
+    const unsubAuth = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const slot = localStorage.getItem("userSlot") || "spot-1"; 
-        setUserSlot(slot);
+        try {
+          const userDoc = await getDoc(doc(db, "applications", user.uid));
+          const slotId = userDoc.data().slot;
+          const slot = slotId;
+          setUserSlot(slot);
 
-        const q = query(collection(db, "vehicles"), where("slot", "==", slot));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-          const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setVehicles(data);
-          setLoading(false);
-        });
+          const q = query(
+            collection(db, "vehicles"),
+            where("slot", "==", slot)
+          );
+          const unsubscribe = onSnapshot(q, (snapshot) => {
+            const data = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            setVehicles(data);
+            setLoading(false);
+          });
 
-        return () => unsubscribe();
+          return () => unsubscribe();
+        } catch (error) {
+          console.error("Error fetching user role:", error);
+        }
       }
     });
 
@@ -32,7 +51,5 @@ const useVehicles = () => {
 };
 
 export default useVehicles;
-
-
 
 //Remove the automatically placed slot 1 to filter vehicles
