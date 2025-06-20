@@ -17,7 +17,7 @@ const useUserRole = (trigger = true) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const userDoc = await getDoc(doc(db, 'applications', user.uid));
           const userRole = userDoc.exists() ? userDoc.data().role : 'client';
           setRole(userRole);
 
@@ -34,7 +34,7 @@ const useUserRole = (trigger = true) => {
     return () => unsubscribe();
   }, [trigger]);
 
-  return { role, loading };
+  return { role, loading};
 };
 
 export default useUserRole;
