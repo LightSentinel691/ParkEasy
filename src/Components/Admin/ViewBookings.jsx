@@ -161,6 +161,3 @@ function ViewBookings() {
 }
 
 export default ViewBookings;
-
-
-"  "
