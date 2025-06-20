@@ -8,14 +8,26 @@ import {
   limit,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import { auth } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { getDoc, doc } from "firebase/firestore";
 import Sidebar from "./Sidebar";
 
-const Dashboard = ({ currentSlotId = "spot-1" }) => {
+const Dashboard = () => {
   const [spotData, setSpotData] = useState(null);
   const [revenueToday, setRevenueToday] = useState(0);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [currentSlotId, setCurrentSlotId] = useState("");
 
-  const time = ( item ) => {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const userDoc = await getDoc(doc(db, "applications", user.uid));
+      const slotId = userDoc.data().slot;
+      setCurrentSlotId(slotId);
+    }
+  });
+
+  const time = (item) => {
     const date = new Date(item);
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
@@ -36,9 +48,10 @@ const Dashboard = ({ currentSlotId = "spot-1" }) => {
         const spot = spotsSnapshot.docs[0]?.data();
         setSpotData(spot);
 
-        // Get today's date boundaries in JavaScript
+        // Get today's date boundaries
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
+       
 
         const endOfToday = new Date();
         endOfToday.setHours(23, 59, 59, 999);
@@ -67,7 +80,7 @@ const Dashboard = ({ currentSlotId = "spot-1" }) => {
             collection(db, "vehicles"),
             where("slot", "==", currentSlotId),
             orderBy("createdAt", "desc"),
-            limit(10)
+            limit(13)
           )
         );
         const recent = recentSnapshot.docs.map((doc) => ({
@@ -130,7 +143,9 @@ const Dashboard = ({ currentSlotId = "spot-1" }) => {
                       <td className="p-3">{item.vehiclePlate}</td>
                       <td className="p-3 capitalize">{item.status}</td>
                       <td className="p-3">KES {item.amountPaid || 0}</td>
-                      <td className="p-3">{item.clockIn ? time(item.clockIn) : "-"}</td>
+                      <td className="p-3">
+                        {item.clockIn ? time(item.clockIn) : "-"}
+                      </td>
                       <td className="p-3">
                         {item.clockOut ? time(item.clockOut) : "-"}
                       </td>
