@@ -42,7 +42,6 @@ export default function AddVehicle() {
   const deductParkingSlot = async () => {
     try {
       const user = auth.currentUser;
-      if (!user) throw new Error("No auhenticated user");
 
       //we get the user's parkingSlot
       const userDoc = await getDoc(doc(db, "applications", user.uid));
