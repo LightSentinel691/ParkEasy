@@ -23,7 +23,7 @@ const LoginPage = () => {
   const parkingSlotId = location.state?.id;
 
   // Redirect based on role
-  if (role === "admin") navigate("/admin-dashboard");
+  if (role === "admin") {setIsAuthenticated(true); navigate("/dashboard");}
   else if (role === "client") {
     if (from === "/") {
       setIsAuthenticated(true);
