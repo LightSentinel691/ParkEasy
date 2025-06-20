@@ -1,8 +1,9 @@
 import { useState } from "react";
 import useVehicles from "../hooks/useVehicles";
 import Modal from "./Modal";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc, getDocs,collection, where, query } from "firebase/firestore";
 import { db } from "../../firebase";
+import { auth } from "../../firebase";
 import Sidebar from "./Sidebar";
 
 export default function Vehicles() {
@@ -22,6 +23,36 @@ export default function Vehicles() {
     const outTime = new Date(timeOut);
     const hours = Math.ceil((outTime - inTime) / (1000 * 60 * 60));
     return hours * 3;
+  };
+  const updateParkingSpaces = async () => {
+    try {
+      const user = auth.currentUser;
+
+      //we get the user's parkingSlot
+      const userDoc = await getDoc(doc(db, "applications", user.uid));
+      const slotId = userDoc.data().slot;
+
+      const slotNumber = parseInt(slotId.split("-")[1]);
+
+      // Get parking spot info
+      const spotsSnapshot = await getDocs(
+        query(collection(db, "parkingSpots"), where("id", "==", slotNumber))
+      );
+      const spotDoc = spotsSnapshot.docs[0];
+      if (!spotDoc) throw new Error("No matching parking spot found");
+
+      const spotData = spotDoc.data();
+      let available = spotData.slotsAvailable;
+
+      // Deduct one and update
+      await updateDoc(doc(db, "parkingSpots", spotDoc.id), {
+        slotsAvailable: available + 1,
+      });
+
+      console.log("Updated successfully!");
+    } catch (error) {
+      console.error("Dashboard error:", error.message);
+    }
   };
 
   const handleCheckOut = async (vehicle) => {
@@ -44,6 +75,7 @@ export default function Vehicles() {
 
       setSelectedVehicle(null); // close modal
       alert("Vehicle checked out successfully!");
+      updateParkingSpaces();
     } catch (err) {
       alert("Error checking out vehicle: " + err.message);
     }
@@ -201,4 +233,3 @@ export default function Vehicles() {
   );
 }
 
-//To do, update the parking slots with one more vehicle
