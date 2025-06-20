@@ -43,6 +43,7 @@ export default function AddVehicle() {
     try {
       const user = auth.currentUser;
 
+
       //we get the user's parkingSlot
       const userDoc = await getDoc(doc(db, "applications", user.uid));
       const slotId = userDoc.data().slot;
@@ -165,4 +166,3 @@ export default function AddVehicle() {
   );
 }
 
-// Go to the specific parking lot and remove one parking spot;
