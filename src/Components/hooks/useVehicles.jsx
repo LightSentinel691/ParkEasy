@@ -52,4 +52,3 @@ const useVehicles = () => {
 
 export default useVehicles;
 
-//Remove the automatically placed slot 1 to filter vehicles
