@@ -12,7 +12,7 @@ const useImageLoader = (imageUrl) => {
         const img = new Image();
         img.src = imageUrl;
         img.onload = () => {
-          setTimeout(() => resolve(imageUrl), 2000);
+          resolve(imageUrl), 2000;
         }
         img.onerror = reject;
       });
