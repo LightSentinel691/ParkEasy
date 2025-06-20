@@ -45,6 +45,7 @@ const LoginPage = () => {
     } catch (err) {
       setAuthError("Invalid credentials. Please try again.");
       console.error("Login Error:", err.message);
+      setToastMessage("Invalid credentials. Please try again.");
     }
   };
 
@@ -89,6 +90,7 @@ const LoginPage = () => {
               <Toast
                 message={toastMessage}
                 onClose={() => setToastMessage("")}
+                type={authError? false: "success"}
               />
             )}
           </form>
