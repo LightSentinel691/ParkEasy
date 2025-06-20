@@ -1,44 +1,134 @@
-import React from "react";
-import { useNavigate } from 'react-router-dom';
-import useImageLoader from './hooks/useImageLoader';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import useImageLoader from "./hooks/useImageLoader";
 import parkEasyHero from "../assets/ParkEasyHero.png";
 import parkEasyLogo from "../assets/ParkEasyLogo.png";
-import parkingSlotsJson from '../Data/db.json';
+import { auth, db } from "../firebase";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { getAuth, signOut } from "firebase/auth";
+import Toast from "./Toast";
 
-
-const parkingSpots = parkingSlotsJson;
-
-
-
-function Homepage() {
+function Homepage({ setIsAuthenticated }) {
   const navigate = useNavigate();
+  const [loggedInUserRole, setLoggedInUserRole] = useState(null);
+  const [loggedInUserName, setLoggedInUserName] = useState(null);
+  const [toastMessage, setToastMessage] = useState("");
+  const [data, setData] = useState([]);
+  const [filterQuery, setFilterQuery] = useState("");
+  const [originalData, setOriginalData] = useState([]);
+  const [authError, setAuthError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleLogin = () => {
-    navigate('/Authentication')
-  }
+    navigate("/Authentication");
+  };
 
   const handleRedirectHome = () => {
-    navigate('/')
-  }
-  
+    navigate("/");
+  };
+
   const handleUserBooking = (id) => {
-    navigate('/Confirm', {state: id});
-  }
+    navigate("/Confirm", { state: id });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "parkingSpots"));
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setOriginalData(items);
+        setData(items);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+    const fetchuser = async () => {
+      try {
+        const user = auth.currentUser;
+
+        if (!user) return
+        const userDoc = await getDoc(doc(db, "applications", user.uid));
+        const role = userDoc.data().role;
+        const name = userDoc.data().name;
+
+        const myNameArray = name.split(" ");
+
+        const nameStr = `${myNameArray[0]}+${myNameArray[1]}`;
+        setLoggedInUserName(nameStr);
+        setLoggedInUserRole(role);
+      } catch (error) {
+        setAuthError("Error", error.message);
+        setToastMessage("Error getting user details!");
+      }
+    };
+
+    fetchData();
+    fetchuser();
+  }, []);
+
+  const handleParkingSpotFiltering = () => {
+    const filteredSpots = originalData.filter((parkingSpot) => {
+      const spot = parkingSpot.town || "";
+      return spot.toLowerCase().includes(filterQuery.toLowerCase());
+    });
+    
+    setData(filteredSpots);
+  };
+
+  const handleLogout = () => {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        setIsAuthenticated(false);
+        setLoggedInUserName(null);
+        setLoggedInUserRole(null);
+        setToastMessage("Successfully logged Out!");
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Error logging out:", error);
+      });
+  };
 
   return (
     <>
       {/* Navigation Bar */}
       <div className="HomeNavBar flex justify-between items-center px-6  bg-white shadow-md">
         <div className="w-[100px]">
-          <img src={parkEasyLogo} alt="Logo" onClick={handleRedirectHome}/>
+          <img src={parkEasyLogo} alt="Logo" onClick={handleRedirectHome} />
         </div>
         <div className="text-lg flex gap-6 text-gray-700">
-          <span className="cursor-pointer hover:text-blue-600" onClick={handleRedirectHome}>Home</span>
-          <span className="cursor-pointer hover:text-blue-600">About</span>
-          <span className="cursor-pointer hover:text-blue-600">Contact</span>
+          <span
+            className="cursor-pointer mt-1 hover:text-blue-600"
+            onClick={handleRedirectHome}
+          >
+            Home
+          </span>
+          <span className="cursor-pointer mt-1 hover:text-blue-600">About</span>
+          <span className="cursor-pointer mt-1 hover:text-blue-600">
+            Contact
+          </span>
+          {loggedInUserRole ? (
+            <div className="w-8 h-8 mt-1 rounded-full bg-gray-200 overflow-hidden">
+              {/* Placeholder for profile picture */}
+              <img
+                src={`https://ui-avatars.com/api/?name=${loggedInUserName}&background=0D8ABC&color=fff&rounded=true`}
+                alt="Profile"
+              />
+            </div>
+          ) : (
+            ""
+          )}
           <span>
-            <button onClick={handleLogin} className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition">
-              Login
+            <button
+              onClick={loggedInUserRole ? handleLogout : handleLogin}
+              className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition"
+            >
+              {loggedInUserRole ? "Log Out" : "Log In"}
             </button>
           </span>
         </div>
@@ -71,11 +161,15 @@ function Homepage() {
             {/* Search Bar */}
             <div className="flex items-center bg-white border rounded-full overflow-hidden w-full max-w-md shadow-sm">
               <input
+                onChange={(e) => setFilterQuery(e.target.value)}
                 type="text"
                 placeholder="Enter Your Destination"
                 className="flex-grow p-3 px-5 text-gray-800 outline-none"
               />
-              <button className="bg-blue-600 text-white px-6 py-3 hover:bg-blue-700 transition">
+              <button
+                className="bg-blue-600 text-white px-6 py-3 hover:bg-blue-700 transition"
+                onClick={handleParkingSpotFiltering}
+              >
                 🔍 Search
               </button>
             </div>
@@ -85,7 +179,7 @@ function Homepage() {
 
       {/* Available Parking Slots Section */}
       <div>
-        <ListParkingSpots handleUserBooking={handleUserBooking}/>
+        <ListParkingSpots handleUserBooking={handleUserBooking} data={data} loading={isLoading}/>
       </div>
 
       {/* Footer Section */}
@@ -97,30 +191,38 @@ function Homepage() {
         </div>
         <p>©2025 ParkEasy. All rights reserved.</p>
       </div>
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          onClose={() => setToastMessage("")}
+          type={authError ? false : "success"}
+        />
+      )}
     </>
   );
 }
 
 export default Homepage;
 
-const ListParkingSpots = ({handleUserBooking}) => {
-  // Parking Slot List Wrapper 
-  //Get the data from Database
-  const firstFiveSlots = parkingSpots.slice(0, 6);
-
-  
+const ListParkingSpots = ({ handleUserBooking, data, loading }) => {
+  if(data.length == 0) {
+    return loading ? <p className="text-center text-2xl mb-5 mt-2">Loading...</p> : <p className="text-center text-2xl mb-5 mt-2">No data for this Location</p>
+  }
+  // Parking Slot List Wrapper
+  const firstFiveSlots = data.slice(0, 6);
 
   return (
     <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 py-10 bg-gray-50">
       {firstFiveSlots.map((parkingSlot) => (
-        <DisplayParkingSpot key={parkingSlot.id} slot={parkingSlot} handleUserBooking={handleUserBooking}/>
+        <DisplayParkingSpot
+          key={parkingSlot.id}
+          slot={parkingSlot}
+          handleUserBooking={handleUserBooking}
+        />
       ))}
     </ul>
   );
 };
-
-
-
 
 const DisplayParkingSpot = ({ slot, handleUserBooking }) => {
   const { imageLoaded, imageSrc } = useImageLoader(slot.Thumbnail);
@@ -141,9 +243,14 @@ const DisplayParkingSpot = ({ slot, handleUserBooking }) => {
       <div className="p-4 space-y-2">
         <h2 className="text-xl font-semibold text-gray-800">{slot.title}</h2>
         <p className="text-gray-600">Slots: {slot.slotsAvailable}</p>
-        <p className="text-gray-600">Rate: ${`${slot.charges}`}/hour</p>
+        <p className="text-gray-600">Rate: {`Ksh. ${slot.charges}`}/hour</p>
         <p className="text-gray-500 text-sm">{slot.location}</p>
-        <button onClick={() => {handleUserBooking(slot.id)}} className="mt-2 bg-blue-600 text-white w-full py-2 rounded-md hover:bg-blue-700 transition">
+        <button
+          onClick={() => {
+            handleUserBooking(slot.id);
+          }}
+          className="mt-2 bg-blue-600 text-white w-full py-2 rounded-md hover:bg-blue-700 transition"
+        >
           Reserve
         </button>
       </div>
@@ -151,11 +258,5 @@ const DisplayParkingSpot = ({ slot, handleUserBooking }) => {
   );
 };
 
-//To Do:- 
-//Implement the search Function
-//Create the Reserve Page and Link to It
-// Have the Navbar Links Functionality.
+//To Do:-
 //Hover Feature on Parking Listing.
-// On loading the page check if the user is logged in
-// Add icon on user logging in
-// On logging in the taskbar changes to show the Bookings tab
