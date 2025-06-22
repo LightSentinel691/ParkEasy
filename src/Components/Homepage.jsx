@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useImageLoader from "./hooks/useImageLoader";
 import parkEasyHero from "../assets/ParkEasyHero.png";
-import parkEasyLogo from "../assets/ParkEasyLogo.png";
 import { auth, db } from "../firebase";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { getAuth, signOut } from "firebase/auth";
@@ -79,6 +78,19 @@ function Homepage({ setIsAuthenticated }) {
     setData(filteredSpots);
   };
 
+  const handleViewBookings = () => {
+    if (loggedInUserName && loggedInUserRole) {
+      
+      if (loggedInUserRole === 'admin') {
+        navigate("/dashboard")
+      } else {
+        navigate("/Bookings")
+      }
+    } else {
+      alert("I have been Clicked")
+    }
+  }
+
   const handleLogout = () => {
     const auth = getAuth();
     signOut(auth)
@@ -97,23 +109,24 @@ function Homepage({ setIsAuthenticated }) {
   return (
     <>
       {/* Navigation Bar */}
-      <div className="HomeNavBar flex justify-between items-center px-6  bg-white shadow-md">
-        <div className="w-[100px]">
-          <img src={parkEasyLogo} alt="Logo" onClick={handleRedirectHome} />
+      <div className="HomeNavBar flex justify-between items-center px-6  bg-white shadow-md py-6">
+        <div className="text-3xl font-semibold flex items-center gap-1">
+          <span onClick={handleRedirectHome} className="w-2 h-2 bg-black rounded-full inline-block"></span>
+          ParkEasy
         </div>
         <div className="text-lg flex gap-6 text-gray-700">
           <span
-            className="cursor-pointer mt-1 hover:text-blue-600"
+            className="cursor-pointer mt-1 hover:text-blue-600 text-xl"
             onClick={handleRedirectHome}
           >
             Home
           </span>
-          <span className="cursor-pointer mt-1 hover:text-blue-600">About</span>
-          <span className="cursor-pointer mt-1 hover:text-blue-600">
-            Contact
+          <span className="cursor-pointer mt-1 text-xl hover:text-blue-600 ">About</span>
+          <span className="cursor-pointer mt-1 text-xl hover:text-blue-600" onClick={handleViewBookings}>
+            {!loggedInUserName && !loggedInUserRole ? 'Contact' : loggedInUserRole === 'admin' ? 'Dashboard' : 'Bookings'}
           </span>
           {loggedInUserRole ? (
-            <div className="w-8 h-8 mt-1 rounded-full bg-gray-200 overflow-hidden">
+            <div className="w-9 h-9 mt-1 rounded-full bg-gray-200 overflow-hidden">
               {/* Placeholder for profile picture */}
               <img
                 src={`https://ui-avatars.com/api/?name=${loggedInUserName}&background=0D8ABC&color=fff&rounded=true`}
@@ -228,7 +241,7 @@ const DisplayParkingSpot = ({ slot, handleUserBooking }) => {
   const { imageLoaded, imageSrc } = useImageLoader(slot.Thumbnail);
 
   return (
-    <li className="bg-white rounded-xl shadow-md overflow-hidden">
+    <li className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl hover:shadow-zinc-700">
       {imageLoaded ? (
         <img
           src={imageSrc}
@@ -258,5 +271,4 @@ const DisplayParkingSpot = ({ slot, handleUserBooking }) => {
   );
 };
 
-//To Do:-
-//Hover Feature on Parking Listing.
+
