@@ -103,7 +103,7 @@ function MyBookings() {
             Home
           </a>
           <a className="hover:underline pr-4 text-xl">About Us</a>
-          <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+          <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden">
             {/* Placeholder for profile picture */}
              <img
                 src={`https://ui-avatars.com/api/?name=${loggedInUserName}&background=0D8ABC&color=fff&rounded=true`}
