@@ -206,5 +206,4 @@ export default function BookingPage() {
 
 // To do: -
 // Total to be calculated after entering the time
-// Navigation Links on the top bar
 // within an hour to the appointed time, deduct one parking slot from the specified lot.
