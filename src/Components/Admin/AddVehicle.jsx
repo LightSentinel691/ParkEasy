@@ -13,11 +13,13 @@ import { auth } from "../../firebase";
 import { doc } from "firebase/firestore";
 import Sidebar from "./Sidebar";
 import { useNavigate } from "react-router-dom";
+import Toast from "../Toast";
 
 export default function AddVehicle() {
   const { addVehicle, loading, error } = useAddVehicle();
   const navigate = useNavigate();
-
+  const [toastMessage, setToastMessage] = useState("");
+  const [uploadingError, setUploadingError] = useState(null);
   const [formData, setFormData] = useState({
     plate: "",
     ownerName: "",
@@ -42,7 +44,6 @@ export default function AddVehicle() {
   const deductParkingSlot = async () => {
     try {
       const user = auth.currentUser;
-
 
       //we get the user's parkingSlot
       const userDoc = await getDoc(doc(db, "applications", user.uid));
@@ -76,7 +77,7 @@ export default function AddVehicle() {
     e.preventDefault();
     try {
       await addVehicle(formData);
-      alert("Vehicle added successfully!");
+      setToastMessage("Vehicle added succesfully...");
       setFormData({
         plate: "",
         ownerName: "",
@@ -91,7 +92,8 @@ export default function AddVehicle() {
       //We deduct one parkingslot from the available slots
       deductParkingSlot();
     } catch (err) {
-      alert("Failed to add vehicle: " + err);
+      setUploadingError("Error in uploading data.");
+      setToastMessage("Failed to add vehicle: " + err);
     }
   };
 
@@ -162,7 +164,13 @@ export default function AddVehicle() {
           </div>
         </div>
       </div>
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          onClose={() => setToastMessage("")}
+          type={uploadingError ? false : "success"}
+        />
+      )}
     </div>
   );
 }
-
