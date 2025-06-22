@@ -1,15 +1,26 @@
 import { useState } from "react";
 import useVehicles from "../hooks/useVehicles";
 import Modal from "./Modal";
-import { doc, updateDoc, getDoc, getDocs,collection, where, query } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  getDoc,
+  getDocs,
+  collection,
+  where,
+  query,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 import { auth } from "../../firebase";
 import Sidebar from "./Sidebar";
+import Toast from "../Toast";
 
 export default function Vehicles() {
   const { vehicles, loading } = useVehicles();
   const [search, setSearch] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [toastMessage, setToastMessage] = useState("");
+  const [checkoutError, setCheckoutError] = useState(null);
 
   const filteredVehicles = vehicles.filter((v) =>
     v.ownerName.toLowerCase().includes(search.toLowerCase())
@@ -74,10 +85,11 @@ export default function Vehicles() {
       });
 
       setSelectedVehicle(null); // close modal
-      alert("Vehicle checked out successfully!");
+      setToastMessage("Successfully checked out vehicle");
       updateParkingSpaces();
     } catch (err) {
-      alert("Error checking out vehicle: " + err.message);
+      setCheckoutError("Error checking out vehicle: " + err.message);
+      setToastMessage("Error Checking out vehicle");
     }
   };
 
@@ -229,7 +241,13 @@ export default function Vehicles() {
           )}
         </div>
       </div>
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          onClose={() => setToastMessage("")}
+          type={checkoutError ? false : "success"}
+        />
+      )}
     </div>
   );
 }
-
