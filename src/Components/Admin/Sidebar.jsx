@@ -7,16 +7,16 @@ export default function Sidebar() {
       <div>
         <h1 className="text-2xl font-bold mb-6">ParkEasy</h1>
         <nav className="flex flex-col gap-4">
-          <Link to="/" className="flex items-center gap-2 text-lg font-medium">
+          <Link to="/dashboard" className="flex items-center gap-2 text-lg font-medium">
             <LayoutDashboard size={24} /> Dashboard
           </Link>
           <Link to="/add-vehicle" className="flex items-center gap-2 text-lg font-medium">
             <PlusCircle size={24} /> Add Vehicle
           </Link>
           <Link to="/vehicles" className="flex items-center gap-2 text-lg font-medium"><Car size={24} /> Vehicles</Link>
-          <a className="flex items-center gap-2 text-lg font-medium"><NotebookPen size={24} /> Booking</a>
-          <a className="flex items-center gap-2 text-lg font-medium"><House size={24} /> Home</a>
-          <a className="flex items-center gap-2 text-lg font-medium"><FileText size={24} /> Reports</a>
+          <Link to="/view-bookings" className="flex items-center gap-2 text-lg font-medium"><NotebookPen size={24} /> Bookings</Link>
+          <Link to="/" className="flex items-center gap-2 text-lg font-medium"><House size={24} /> Home</Link>
+          {/* <a className="flex items-center gap-2 text-lg font-medium"><FileText size={24} /> Reports</a> */}
         </nav>
       </div>
       <div>
@@ -28,4 +28,4 @@ export default function Sidebar() {
   );
 }
 
-//Home links to the Page Welcome homepage
+//Work on the reports page to display it and fetch the data.
