@@ -133,7 +133,3 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
-
-
-//To Do: - 
-// Redirect to HomePage after registering the user
