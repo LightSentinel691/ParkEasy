@@ -1,4 +1,3 @@
-// hooks/useBooking.js
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useState } from "react";
 import { db, auth } from "../../firebase";
@@ -13,13 +12,15 @@ export const useBooking = () => {
     setLoading(true);
     setError(null);
 
+    const locationValue = `spot-${formData.location}`;
+
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("User not authenticated");
 
       const booking = {
         userId: user.uid,
-        location: formData.location,
+        location: locationValue,
         date: formData.date,
         time: formData.time,
         duration: formData.duration,
@@ -30,7 +31,7 @@ export const useBooking = () => {
           expiry: formData.expiry,
           cvv: formData.cvv
         },
-        status: "Confirmed",
+        status: "Pending",
         createdAt: serverTimestamp()
       };
 
