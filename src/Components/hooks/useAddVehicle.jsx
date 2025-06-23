@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { db, auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -23,7 +23,11 @@ const useAddVehicle = () => {
     return new Promise((resolve, reject) => {
       onAuthStateChanged(auth, async (user) => {
         if (user) {
+          console.log(user.uid);
+          console.log(user);
           try {
+            const userDoc = await getDoc(doc(db, "applications", user.uid));
+            const slotId = userDoc.data().slot;
             const docRef = await addDoc(collection(db, "vehicles"), {
               vehiclePlate: plate,
               ownerName,
@@ -32,7 +36,7 @@ const useAddVehicle = () => {
               timeIn,
               clockIn: dateTimeString,
               status: "Ongoing",
-              slot: "spot-1",
+              slot: slotId,
               createdBy: user.uid,
               createdAt: serverTimestamp(),
             });
@@ -56,5 +60,3 @@ const useAddVehicle = () => {
 };
 
 export default useAddVehicle;
-
-//Remove the hardcoded Slot value to get the value dynamically
