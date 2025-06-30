@@ -1,5 +1,4 @@
 import React from "react";
-import parkEasyLogo from "../../assets/ParkEasyLogo.png";
 import { Outlet } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -16,9 +15,10 @@ function AuthenticationHome({setIsAuthenticated}) {
   return (
     <>
       {/* Navigation Bar */}
-      <div className="HomeNavBar flex justify-between items-center px-6 bg-white shadow-md">
-        <div className="w-[100px]">
-          <img src={parkEasyLogo} alt="Logo" onClick={handleRedirectHome} />
+      <div className="HomeNavBar flex justify-between items-center px-6 bg-white shadow-md py-6">
+        <div className="text-3xl font-semibold flex items-center gap-1" onClick={handleRedirectHome}>
+          <span className="w-2 h-2 bg-black rounded-full inline-block"></span>
+          ParkEasy
         </div>
         <div className="text-lg flex gap-6 text-gray-700">
           <span

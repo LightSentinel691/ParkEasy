@@ -4,10 +4,14 @@ import AuthenticationHome from "./Components/Authentication/AuthenticationHome";
 import LoginPage from "./Components/Authentication/LoginPage";
 import Homepage from "./Components/Homepage";
 import RegisterPage from "./Components/Authentication/Registration";
-import BookingConfirmation from "./Components/BookingConfirmation";
+import BookingConfirmation from "./Components/BookingPage";
 import { useState } from "react";
 import ProtectedRoute from "./Components/ProtectedRoute";
-import UserBookings from "./Components/UserBookings";
+import UserBookings from "./Components/MyBookings";
+import Dashboard from "./Components/Admin/Dashboard";
+import AddVehicle from "./Components/Admin/AddVehicle";
+import Vehicles from "./Components/Admin/Vehicles";
+import ViewBookings from "./Components/Admin/ViewBookings";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,20 +20,24 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/Authentication" element={<AuthenticationHome setIsAuthenticated={setIsAuthenticated}/>}>
+          <Route path="/" element={<Homepage  setIsAuthenticated={setIsAuthenticated}/>} />
+          
+          <Route
+            path="/Authentication"
+            element={
+              <AuthenticationHome setIsAuthenticated={setIsAuthenticated} />
+            }>
             <Route index element={<LoginPage />} />
             <Route path="Register" element={<RegisterPage />} />
           </Route>
-          <Route
-            path="/confirm"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <BookingConfirmation />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/Bookings" element={< UserBookings />} />
+          <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/confirm" element={<BookingConfirmation />} />
+            <Route path="/add-vehicle" element={<AddVehicle />} />
+            <Route path="/vehicles" element={<Vehicles />} />
+            <Route path="/view-bookings" element={<ViewBookings />} />
+            <Route path="/Bookings" element={<UserBookings />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </>
@@ -39,4 +47,5 @@ function App() {
 export default App;
 
 
-// Userbookings is not protected as it is not visible when opening the page only after one has Logged in
+
+// Work on images of the parking slots
